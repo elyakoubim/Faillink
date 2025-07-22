@@ -1,0 +1,52 @@
+{
+  "name": "back-end",
+  "version": "1.0.0",
+  "description": "This is a boilerplate **MERN backend** (MongoDB, Express, Node.js) project. It includes a modular user model that separates `auth_user` (authentication data) and `app_user` (business logic-specific data). This design enables flexibility for different apps where core user authentication logic remains consistent, but app-specific user data can vary.",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abjabja/QuickStart-MERN-back-end.git"
+  },
+  "author": "ABJABJA SalahEddine",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abjabja/QuickStart-MERN-back-end/issues"
+  },
+  "homepage": "https://github.com/abjabja/QuickStart-MERN-back-end#readme",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "bcryptjs": "^2.4.3",
+    "canvas": "^3.1.2",
+    "cheerio": "^1.1.0",
+    "cloudinary": "^2.7.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "openai": "^4.77.3",
+    "express-async-errors": "^3.1.1",
+    "google-auth-library": "^9.4.2",
+    "http-status-codes": "^2.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.2.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^4.2.1",
+    "nodemon": "^3.1.10",
+    "p-limit": "^6.2.0",
+    "pdf-lib": "^1.17.1",
+    "pdf-to-img": "^4.5.0",
+    "pdfjs-dist": "^3.10.111",
+    "sharp": "^0.34.3",
+    "tesseract.js": "^5.0.4",
+    "uuid": "^11.1.0",
+    "validator": "^13.7.0",
+    "xml2js": "^0.6.2"
+  }
+}
