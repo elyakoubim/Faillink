@@ -7,19 +7,31 @@ import Notifications from "../views/Notifications.vue";
 import Documents from "../views/Documents.vue";
 import Analytics from "../views/Analytics.vue";
 import Settings from "../views/Settings.vue";
-import Index from '../views/Index.vue'
+import Index from "../views/Index.vue";
+import Login from "../views/auth/Login.vue";
+import Register from "../views/auth/Register.vue" ;
 
 const routes = [
-  { path: "/", name: "Index", component: Index ,children:[
-  { path: "/dashboard", name: "Dashboard", component: Dashboard },
-  { path: "/profile", name: "Profile", component: Profile },
-  { path: "/messages", name: "Messages", component: Messages },
-  { path: "/notifications", name: "Notifications", component: Notifications },
-  { path: "/documents", name: "Documents", component: Documents },
-  { path: "/analytics", name: "Analytics", component: Analytics },
-  { path: "/settings", name: "Settings", component: Settings }
-  ]},
-  ,
+  {
+    path: "/",
+    name: "Index",
+    component: Index,
+    children: [
+      { path: "/dashboard", name: "Dashboard", component: Dashboard },
+      { path: "/profile", name: "Profile", component: Profile },
+      { path: "/messages", name: "Messages", component: Messages },
+      {
+        path: "/notifications",
+        name: "Notifications",
+        component: Notifications,
+      },
+      { path: "/documents", name: "Documents", component: Documents },
+      { path: "/analytics", name: "Analytics", component: Analytics },
+      { path: "/settings", name: "Settings", component: Settings },
+    ],
+  },
+  { path: "/login", name: "Login", component: Login },
+  { path: "/register", name: "Register", component: Register },
 ];
 
 const router = createRouter({
