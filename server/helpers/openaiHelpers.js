@@ -1,26 +1,36 @@
-
 // helpers/openaiHelpers.js
-import OpenAI from 'openai';
+import OpenAI from "openai/index.mjs";
 
-const openai = new OpenAI({ apiKey: "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" });
-
+const openai = new OpenAI({
+  apiKey:
+    "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",
+});
 
 /**
  * Génère le prompt d'analyse des actifs physiques à partir
  * de métadonnées et (si disponible) du JSON comptable structuré.
  * Vous pouvez adapter les chemins selon le schéma réel renvoyé par la Banque Nationale.
  */
-function buildPhysicalAssetsPrompt({ dateBilan, acquisitionValue, amortissementsCumules, vnc, stocks, rawSnippet }) {
+function buildPhysicalAssetsPrompt({
+  dateBilan,
+  acquisitionValue,
+  amortissementsCumules,
+  vnc,
+  stocks,
+  rawSnippet,
+}) {
   return `Tu es un expert en analyse comptable de sociétés en faillite.
 
 Voici les données issues du dernier bilan d’une entreprise. Ton rôle est d’évaluer si des **actifs physiques** (machines, véhicules, mobilier, stock) sont encore présents et s’ils ont un potentiel de revente.
 
 Données à analyser :
-- Date du bilan : ${dateBilan ?? 'Inconnue'}
-- Immobilisations corporelles (valeur d’acquisition) : ${acquisitionValue ?? 'Inconnue'}
-- Amortissements cumulés : ${amortissementsCumules ?? 'Inconnus'}
-- Valeur nette comptable : ${vnc ?? 'Inconnue'}
-- Stocks : ${stocks ?? 'Inconnus'}
+- Date du bilan : ${dateBilan ?? "Inconnue"}
+- Immobilisations corporelles (valeur d’acquisition) : ${
+    acquisitionValue ?? "Inconnue"
+  }
+- Amortissements cumulés : ${amortissementsCumules ?? "Inconnus"}
+- Valeur nette comptable : ${vnc ?? "Inconnue"}
+- Stocks : ${stocks ?? "Inconnus"}
 
 Si certaines valeurs sont "Inconnue(s)", déduis-les prudemment à partir du contexte JSON si possible, sinon indique clairement qu’elles sont non disponibles.
 
@@ -66,41 +76,42 @@ ${rawSnippet}
  */
 function extractKeyFigures(accountingData = {}) {
   // Heuristiques / chemins possibles (à ajuster)
-  const tangibles = accountingData?.balanceSheet?.assets?.fixedAssets?.tangible
-                   || accountingData?.FixedAssets?.Tangible
-                   || accountingData?.ImmobilisationsCorporelles;
+  const tangibles =
+    accountingData?.balanceSheet?.assets?.fixedAssets?.tangible ||
+    accountingData?.FixedAssets?.Tangible ||
+    accountingData?.ImmobilisationsCorporelles;
 
   const acquisitionValue =
-    tangibles?.acquisitionValue
-    || tangibles?.grossValue
-    || tangibles?.ValeurAcquisition
-    || null;
+    tangibles?.acquisitionValue ||
+    tangibles?.grossValue ||
+    tangibles?.ValeurAcquisition ||
+    null;
 
   const amortissementsCumules =
-    tangibles?.accumulatedDepreciation
-    || tangibles?.amortissementsCumules
-    || tangibles?.Depreciation
-    || null;
+    tangibles?.accumulatedDepreciation ||
+    tangibles?.amortissementsCumules ||
+    tangibles?.Depreciation ||
+    null;
 
   const vnc =
-    tangibles?.netBookValue
-    || tangibles?.valeurNette
-    || tangibles?.ValeurNetteComptable
-    || (acquisitionValue != null && amortissementsCumules != null
-        ? acquisitionValue - amortissementsCumules
-        : null);
+    tangibles?.netBookValue ||
+    tangibles?.valeurNette ||
+    tangibles?.ValeurNetteComptable ||
+    (acquisitionValue != null && amortissementsCumules != null
+      ? acquisitionValue - amortissementsCumules
+      : null);
 
   const stocks =
-    accountingData?.balanceSheet?.assets?.currentAssets?.inventories
-    || accountingData?.Stocks
-    || accountingData?.Inventories
-    || null;
+    accountingData?.balanceSheet?.assets?.currentAssets?.inventories ||
+    accountingData?.Stocks ||
+    accountingData?.Inventories ||
+    null;
 
   return {
     acquisitionValue,
     amortissementsCumules,
     vnc,
-    stocks
+    stocks,
   };
 }
 
@@ -108,12 +119,13 @@ function extractKeyFigures(accountingData = {}) {
  * Appelle GPT-4o pour produire l'analyse structurée.
  */
 export async function analysePhysicalAssets({ meta, accountingData }) {
-  const { acquisitionValue, amortissementsCumules, vnc, stocks } = extractKeyFigures(accountingData);
+  const { acquisitionValue, amortissementsCumules, vnc, stocks } =
+    extractKeyFigures(accountingData);
 
   // On réduit le JSON pour le prompt (évite dépassement tokens)
   const rawSnippet = JSON.stringify(
     accountingData,
-    (k, v) => (typeof v === 'number' || typeof v === 'string' ? v : v),
+    (k, v) => (typeof v === "number" || typeof v === "string" ? v : v),
     2
   ).slice(0, 8000); // coupe si très gros
 
@@ -123,19 +135,19 @@ export async function analysePhysicalAssets({ meta, accountingData }) {
     amortissementsCumules,
     vnc,
     stocks,
-    rawSnippet
+    rawSnippet,
   });
 
   const resp = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: "gpt-4o",
     max_tokens: 900,
     temperature: 0.2,
     messages: [
       {
-        role: 'user',
-        content: prompt
-      }
-    ]
+        role: "user",
+        content: prompt,
+      },
+    ],
   });
 
   return resp.choices[0]?.message?.content?.trim();
@@ -147,17 +159,17 @@ export async function analysePhysicalAssets({ meta, accountingData }) {
  */
 export async function ocrImage(url) {
   const resp = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: "gpt-4o",
     max_tokens: 2000,
     messages: [
       {
-        role: 'user',
+        role: "user",
         content: [
           {
-            type: 'text',
+            type: "text",
             text: `Convertis l'image en texte brut exhaustif (en-têtes, pieds, tableaux).`,
           },
-          { type: 'image_url', image_url: { url, detail: 'high' } },
+          { type: "image_url", image_url: { url, detail: "high" } },
         ],
       },
     ],
