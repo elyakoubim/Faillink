@@ -11,6 +11,8 @@ import Index from "../views/Index.vue";
 import Login from "../views/auth/Login.vue";
 import Register from "../views/auth/Register.vue" ;
 
+import EnterpriseDetail from "../views/EnterpriseDetail.vue";
+
 const routes = [
   {
     path: "/",
@@ -28,6 +30,7 @@ const routes = [
       { path: "/documents", name: "Documents", component: Documents },
       { path: "/analytics", name: "Analytics", component: Analytics },
       { path: "/settings", name: "Settings", component: Settings },
+      { path: "/enterprise/:id", name: "EnterpriseDetail", component: EnterpriseDetail },
     ],
   },
   { path: "/login", name: "Login", component: Login },

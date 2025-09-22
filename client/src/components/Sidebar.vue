@@ -57,7 +57,7 @@
     </nav>
 
     <!-- Footer -->
-    <transition name="fade">
+    <!-- <transition name="fade">
       <div v-if="isSidebarOpen" class="sidebar-footer">
         <div class="bg-sky-500 rounded-lg p-3 text-center">
           <p class="text-sky-100 text-sm">Need help?</p>
@@ -66,7 +66,7 @@
           </button>
         </div>
       </div>
-    </transition>
+    </transition> -->
   </div>
 </template>
 
