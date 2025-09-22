@@ -2,8 +2,7 @@
 import OpenAI from "openai/index.mjs";
 
 const openai = new OpenAI({
-  apiKey:
-    "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",
+  apiKey: "",
 });
 
 /**

@@ -36,7 +36,9 @@
       <!-- Content Area -->
       <main class="flex-1 overflow-y-auto p-6">
         <div class="max-w-4xl mx-auto">
-          <router-view></router-view>
+          <div class="card mb-6 p-2 shadow-sm border border-gray-200 rounded-lg ">
+              <router-view></router-view>
+          </div>
         </div>
       </main>
     </div>

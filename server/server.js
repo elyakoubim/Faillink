@@ -74,18 +74,21 @@ const listURL = (from, to, page = 1) =>
   });
 
 async function scrapePage({ from, to, page }) {
+  console.log("I am in scrape range")
   const { data: html } = await axios.get(listURL(from, to, page), {
     headers: { "User-Agent": UA },
     timeout: 15_000,
   });
-
+console.log(listURL(from, to, page), {
+  headers: { "User-Agent": UA },
+  timeout: 15_000,
+});
   const matches = html.match(DIGIT_RE) || [];
   const list = matches.map(clean);
   log(`p${page} ${from}->${to}  raw:${matches.length}`);
 
   const $ = cheerio.load(html);
   const hasNext = $("a.pagination-next").length > 0;
-
   return { list, hasNext };
 }
 
@@ -116,7 +119,7 @@ async function scrapeRange(fromStr, toStr) {
 
 /* ---------- DB connection ----------------------------------------- */
 await connectDB(
-  "mongodb+srv://elmahdibellaziz:hZBzOFRRt3mG7EMW@cluster0.i7ho2iz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  "mongodb+srv://elmahdibellaziz:LDpJS6X4iYQeYrhW@cluster1.v1n5xx9.mongodb.net/faillink_db?retryWrites=true&w=majority&appName=Cluster1"
 )
   .then(() => console.log("⇢ MongoDB connected"))
   .catch((e) => {
@@ -136,7 +139,6 @@ app.get("/scrape", async (req, res) => {
 
   let from = req.query.from || req.query.date;
   let to = req.query.to || req.query.date;
-
   if (!from || !to)
     return res.status(400).json({
       error: "Use ?date=YYYY-MM-DD  OR  ?from=YYYY-MM-DD&to=YYYY-MM-DD",
@@ -144,14 +146,17 @@ app.get("/scrape", async (req, res) => {
 
   from = toDate(from);
   to = toDate(to);
+
   if (!isGood(from) || !isGood(to) || from.isAfter(to))
     return res.status(400).json({ error: "Invalid or reversed dates" });
+
 
   try {
     const [fromStr, toStr] = [from, to].map((d) => d.format("YYYY-MM-DD"));
     log(`API scrape ${fromStr} → ${toStr}`);
 
     const data = await scrapeRange(fromStr, toStr);
+
     const doc = await Batch.create({
       ...data,
       from: fromStr,
@@ -161,13 +166,19 @@ app.get("/scrape", async (req, res) => {
 
     log(`saved batch _id=${doc._id}`);
     res.json({ from: fromStr, to: toStr, ...data }); // respond to client quickly
-
+// return;
     // Process enterprise details in the background
     const allEnterpriseNumbers = data.pages.flatMap((page) => page.list);
 
     Promise.allSettled(
       allEnterpriseNumbers.map(async (number) => {
         try {
+          // Check if enterprise details already exist in DB
+          const exists = await EnterpriseDetail.findOne({ enterpriseNumber: number });
+          if (exists) {
+            // Already in DB, skip API call
+            return;
+          }
           // Call the correct endpoint for enterprise details
           const { data: details } = await axios.get(
             `http://localhost:${PORT}/enterprise/read?enterprise_number=${number}`
