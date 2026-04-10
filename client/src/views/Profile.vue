@@ -22,15 +22,17 @@
             >
           </div>
           
-          <select class="filter-select" v-model="selectedRegion">
-            <option value="">Toutes les régions</option>
+                    <select class="filter-select" v-model="selectedRegion">
+                        <option value="ALL">All</option>
+                        <option value="">Toutes les régions</option>
             <option value="Bruxelles-Capitale">Bruxelles-Capitale</option>
             <option value="Wallonie">Wallonie</option>
             <option value="Flandre">Flandre</option>
           </select>
 
           <select class="filter-select" v-model="selectedSector">
-            <option value="">Tous les secteurs</option>
+                        <option value="ALL">All</option>
+                        <option value="">Tous les secteurs</option>
             <option value="Services informatiques">Services informatiques</option>
             <option value="Boulangerie-pâtisserie">Boulangerie-pâtisserie</option>
             <option value="Transport routier">Transport routier</option>
@@ -126,8 +128,8 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const companies = ref([]);
 const searchQuery = ref("");
-const selectedRegion = ref("");
-const selectedSector = ref("");
+const selectedRegion = ref("ALL");
+const selectedSector = ref("ALL");
 const selectedScore = ref("");
 const selectedPeriod = ref("");
 const selectedActifType = ref("");
@@ -167,10 +169,14 @@ const filteredCompanies = computed(() => {
     const matchesQuery =
       !searchQuery.value ||
       c.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-    const matchesRegion =
-      !selectedRegion.value || c.region === selectedRegion.value;
-    const matchesSector =
-      !selectedSector.value || c.sector === selectedSector.value;
+        const matchesRegion =
+            !selectedRegion.value ||
+            selectedRegion.value === "ALL" ||
+            c.region === selectedRegion.value;
+        const matchesSector =
+            !selectedSector.value ||
+            selectedSector.value === "ALL" ||
+            c.sector === selectedSector.value;
     const matchesScore =
       !selectedScore.value || c.score === selectedScore.value;
     return matchesQuery && matchesRegion && matchesSector && matchesScore;
